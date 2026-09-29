@@ -1,19 +1,22 @@
 # OmniStock — High-Performance Multi-Tenant Inventory Management System
 
-A production-grade, fast, lightweight multi-tenant Inventory Management & ERP platform with row-level data partitioning, real-time stock matrix tracking, barcode & QR scanner integration, automated low-stock and batch expiry alerts, and full purchase/sales order lifecycles.
+A production-grade, fast, lightweight multi-tenant Inventory Management & ERP platform with a **modern light design system**, public marketing & verification portal, row-level data partitioning, real-time stock matrix tracking, barcode & QR scanner integration, automated low-stock and batch expiry alerts, and full purchase/sales order lifecycles.
 
 ---
 
 ## 🌟 Key Architecture & Highlights
 
+- **Light Modern Theme**: Crisp slate-50 canvas, clean white surfaces, subtle borders, high contrast readability, and refined emerald accents.
+- **Dual-Mode UI Architecture**:
+  1. **Public Portal Website**: A public-facing website featuring hero value propositions, enterprise capability highlights, interactive public SKU/barcode verification, and a tenant gateway.
+  2. **Internal Tenant Workspace**: A dedicated, role-partitioned workspace with executive KPI dashboards, product catalog, multi-warehouse routing, procurement & sales order execution, barcode hub, and audit trails.
 - **Multi-Tenant Architecture**: Strict row-level partition isolation via indexed `tenant_id`. Seamless 1-click organization switcher.
 - **Fast Lightweight Backend**: Built on Node.js + Express with high-throughput SQLite (`better-sqlite3` in WAL mode) and automated migrations.
-- **Modern Glassmorphism UI**: Built with React 18, Vite, TailwindCSS, Lucide Icons, and interactive SVG/QR Code generation.
 - **Real-Time Inventory Operations**:
   - **Stock In (Goods Receipt)**: Batch & expiration date logging.
   - **Stock Out (Dispatch)**: Automated deduction with reason codes.
   - **Physical Cycle Count Adjustment**: Real-time discrepancy balancing.
-  - **Inter-Warehouse Transfers**: In-transit state flow (`IN_TRANSIT` ➡️ `RECEIVED`).
+  - **Inter-Warehouse Transfers**: In-transit state flow (`IN_TRANSIT` ➔ `RECEIVED`).
 - **Procurement & Fulfillment**:
   - **Purchase Orders (Inbound)**: Multi-line procurement with automated stock intake.
   - **Sales Orders (Outbound)**: Client orders with automated stock reservation and shipment deduction.
@@ -30,7 +33,7 @@ A production-grade, fast, lightweight multi-tenant Inventory Management & ERP pl
 
 ### 1. Install Dependencies
 ```bash
-# In project root
+# In project root (d:\tk\inventory)
 npm run install:all
 ```
 
@@ -44,7 +47,7 @@ npm run seed
 npm run dev
 ```
 
-- **Frontend App**: [http://localhost:5173](http://localhost:5173)
+- **Public Website & Portal**: [http://localhost:5173](http://localhost:5173)
 - **Backend REST API**: [http://localhost:5000/api](http://localhost:5000/api)
 - **API Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
@@ -59,30 +62,3 @@ All seeded demo accounts use password: `Password123!`
 | **Apex Global Electronics** | High-Tech / Semiconductors | `admin@apex.com` | Microcontrollers, LiDAR, Sensors |
 | **GreenLeaf Organics & FMCG** | Food & Perishables | `admin@greenleaf.com` | Cold storage, Batch expiry tracking |
 | **Titan Industrial Machinery** | Heavy Machinery & Parts | `admin@titan.com` | Heavy parts, Industrial cylinders |
-
----
-
-## 📂 Project Structure
-
-```
-├── backend/
-│   ├── src/
-│   │   ├── config/database.js    # SQLite schema & foreign keys in WAL mode
-│   │   ├── middleware/           # Tenant resolution & JWT auth/RBAC
-│   │   ├── routes/               # Modular REST endpoints
-│   │   ├── services/             # Audit logs & automated alert triggers
-│   │   ├── database/seed.js      # Multi-tenant demo dataset
-│   │   └── server.js             # Express API entrypoint
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/           # Navbar, Sidebar, Modals
-│   │   ├── context/              # Auth & Multi-tenant context
-│   │   ├── services/api.js       # Frontend REST client
-│   │   ├── views/                # Dashboard, Products, Warehouses, Operations, Orders, Barcode Hub, Alerts, Audit
-│   │   ├── App.jsx
-│   │   └── index.css             # Glassmorphic Tailwind design system
-│   └── package.json
-├── dev-runner.js                 # Dual-service concurrent runner
-└── package.json                  # Monorepo root orchestrator
-```
