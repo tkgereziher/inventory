@@ -101,6 +101,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const setAuthSession = (token, newUser, newTenant) => {
+    if (token) localStorage.setItem('omni_token', token);
+    if (newUser?.tenant_id || newTenant?.id) {
+      localStorage.setItem('omni_tenant_id', newUser?.tenant_id || newTenant?.id);
+    }
+    if (newUser) setUser(newUser);
+    if (newTenant) setCurrentTenant(newTenant);
+    init();
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -112,6 +122,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       switchTenant,
       quickDemoLogin,
+      setAuthSession,
       refreshTenants: init
     }}>
       {children}

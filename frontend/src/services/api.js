@@ -116,4 +116,11 @@ export const api = {
   // Users
   getUsers: () => request('/users'),
   createUser: (body) => request('/users', { method: 'POST', body: JSON.stringify(body) }),
+
+  // Subscriptions & Chapa Payments
+  getSubscriptionPlans: () => request('/subscriptions/plans'),
+  getCurrentSubscription: () => request('/subscriptions/current'),
+  initiateChapaCheckout: (body) => request('/subscriptions/checkout/chapa', { method: 'POST', body: JSON.stringify(body) }),
+  verifyPayment: (tx_ref, simulationSuccess = true) => request('/subscriptions/verify-payment', { method: 'POST', body: JSON.stringify({ tx_ref, simulationSuccess }) }),
+  registerFreeTrial: (body) => request('/subscriptions/free-trial', { method: 'POST', body: JSON.stringify(body) }),
 };

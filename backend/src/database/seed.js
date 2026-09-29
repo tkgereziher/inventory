@@ -9,6 +9,9 @@ export function seed() {
 
   // Clean existing data
   db.exec(`
+    DELETE FROM payments;
+    DELETE FROM subscriptions;
+    DELETE FROM subscription_plans;
     DELETE FROM alerts;
     DELETE FROM audit_logs;
     DELETE FROM transfer_items;
@@ -28,6 +31,83 @@ export function seed() {
     DELETE FROM warehouses;
     DELETE FROM tenants;
   `);
+
+  // Seed Default Subscription Plans
+  const plans = [
+    {
+      id: 'plan-starter',
+      name: 'Starter Tier',
+      code: 'STARTER',
+      price_etb: 1499,
+      price_usd: 29,
+      billing_interval: 'MONTHLY',
+      max_users: 3,
+      max_warehouses: 1,
+      max_products: 500,
+      is_popular: 0,
+      features_json: JSON.stringify([
+        'Up to 3 Team Members',
+        '1 Active Central Warehouse',
+        'Up to 500 Product SKUs',
+        'Standard Webcam & Barcode Scanner',
+        'Purchase & Sales Order Flow',
+        'Stock Movement Logging',
+        'Telebirr & Chapa Payment Gateway'
+      ])
+    },
+    {
+      id: 'plan-pro',
+      name: 'Growth Professional',
+      code: 'PRO',
+      price_etb: 3999,
+      price_usd: 79,
+      billing_interval: 'MONTHLY',
+      max_users: 15,
+      max_warehouses: 5,
+      max_products: 5000,
+      is_popular: 1,
+      features_json: JSON.stringify([
+        'Up to 15 Team Members & Custom Roles',
+        'Up to 5 Multi-Site Warehouses',
+        'Up to 5,000 Product SKUs',
+        'Automated Inter-Warehouse Transfer Routing',
+        'Real-time Webcam Barcode / QR Label Scanner',
+        'Low-Stock & Perishable Expiry Alerts',
+        'Full Immutable Audit Ledger & Traceability',
+        'Chapa Instant Checkout (Telebirr, CBE Birr, Awash)',
+        'Priority Phone & Ticket Support'
+      ])
+    },
+    {
+      id: 'plan-enterprise',
+      name: 'Enterprise Logistics',
+      code: 'ENTERPRISE',
+      price_etb: 8999,
+      price_usd: 179,
+      billing_interval: 'MONTHLY',
+      max_users: 999,
+      max_warehouses: 999,
+      max_products: 999999,
+      is_popular: 0,
+      features_json: JSON.stringify([
+        'Unlimited Team Members & RBAC Roles',
+        'Unlimited Global Warehouses & Bins',
+        'Unlimited Inventory SKUs & Lot Tracking',
+        'Dedicated Tenant Database Partitioning',
+        'Custom Webhooks & REST API Integrations',
+        'Enterprise Analytics & Multi-Branch P&L Reports',
+        'Custom SLA & 24/7 Dedicated Account Engineer',
+        'Chapa & Global Payment Gateways'
+      ])
+    }
+  ];
+
+  for (const p of plans) {
+    db.prepare(`
+      INSERT INTO subscription_plans (id, name, code, price_etb, price_usd, billing_interval, max_users, max_warehouses, max_products, features_json, is_popular)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(p.id, p.name, p.code, p.price_etb, p.price_usd, p.billing_interval, p.max_users, p.max_warehouses, p.max_products, p.features_json, p.is_popular);
+  }
 
   const passwordHash = bcrypt.hashSync('Password123!', 10);
 

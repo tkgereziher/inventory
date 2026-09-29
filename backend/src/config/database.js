@@ -314,6 +314,58 @@ export function initDatabase() {
       FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
     );
 
+    -- Subscription Plans definition
+    CREATE TABLE IF NOT EXISTS subscription_plans (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      code TEXT UNIQUE NOT NULL,
+      price_etb REAL NOT NULL,
+      price_usd REAL NOT NULL,
+      billing_interval TEXT DEFAULT 'MONTHLY',
+      max_users INTEGER DEFAULT 5,
+      max_warehouses INTEGER DEFAULT 2,
+      max_products INTEGER DEFAULT 500,
+      features_json TEXT,
+      is_popular INTEGER DEFAULT 0,
+      is_active INTEGER DEFAULT 1
+    );
+
+    -- Tenant Subscriptions
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL,
+      plan_id TEXT NOT NULL,
+      status TEXT CHECK(status IN ('TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELLED', 'EXPIRED')) DEFAULT 'ACTIVE',
+      billing_cycle TEXT CHECK(billing_cycle IN ('MONTHLY', 'ANNUAL')) DEFAULT 'MONTHLY',
+      current_period_start DATETIME DEFAULT CURRENT_TIMESTAMP,
+      current_period_end DATETIME,
+      cancel_at_period_end INTEGER DEFAULT 0,
+      last_payment_tx_ref TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
+    );
+
+    -- Payments & Chapa Transactions Ledger
+    CREATE TABLE IF NOT EXISTS payments (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT,
+      tx_ref TEXT UNIQUE NOT NULL,
+      chapa_reference TEXT,
+      plan_id TEXT,
+      amount REAL NOT NULL,
+      currency TEXT DEFAULT 'ETB',
+      payment_method TEXT DEFAULT 'CHAPA',
+      payment_channel TEXT, -- e.g. telebirr, cbebirr, awash, card
+      status TEXT CHECK(status IN ('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED')) DEFAULT 'PENDING',
+      customer_name TEXT,
+      customer_email TEXT,
+      customer_phone TEXT,
+      meta_json TEXT,
+      paid_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE SET NULL
+    );
+
     -- Performance Indexes
     CREATE INDEX IF NOT EXISTS idx_products_tenant ON products(tenant_id, sku);
     CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(tenant_id, barcode);
@@ -324,6 +376,9 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_transfers_tenant ON transfers(tenant_id, status);
     CREATE INDEX IF NOT EXISTS idx_audit_tenant ON audit_logs(tenant_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_alerts_tenant ON alerts(tenant_id, is_read);
+    CREATE INDEX IF NOT EXISTS idx_payments_tx_ref ON payments(tx_ref);
+    CREATE INDEX IF NOT EXISTS idx_payments_tenant ON payments(tenant_id);
+    CREATE INDEX IF NOT EXISTS idx_subscriptions_tenant ON subscriptions(tenant_id);
   `);
 }
 
